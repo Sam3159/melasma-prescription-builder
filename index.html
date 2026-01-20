@@ -1,90 +1,249 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-"use strict";
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Melasma Prescription Builder</title>
 
-/* Supabase config */
-const SUPABASE_URL = "https://ogzruhymglenzwizmggd.supabase.co";
-const SUPABASE_KEY = "sb_publishable_VudO6SBFp9kzL2YIkSeTQA_dP8jdGHC";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <style>
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f3f3}
+    .hidden{display:none !important}
+    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);z-index:9999}
+    .box{width:420px;max-width:calc(100% - 24px);background:#fff;border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+    .btn{border:1px solid #ccc;background:#fff;border-radius:999px;padding:10px 14px;cursor:pointer}
+    .btn:hover{background:#f1f1f1}
+    input{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:14px}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row .btn{flex:1}
+    #app{max-width:1100px;margin:18px auto;padding:16px;background:#fff;border-radius:16px}
+    .err{margin-top:8px;color:#b00020;font-size:13px}
+  </style>
+</head>
 
-/* Helpers */
-function el(id) {
-  return document.getElementById(id);
-}
-function show(id, on) {
-  const e = el(id);
-  if (!e) return;
-  e.classList.toggle("hidden", !on);
-}
+<body>
 
-let authIntent = "prescriber";
+  <!-- Landing -->
+  <div id="landing" class="overlay">
+    <div class="box">
+      <h2 style="margin:0 0 8px">Welcome</h2>
+      <p style="margin:0 0 14px;color:#444">Choose how you want to use the builder.</p>
+      <div class="row">
+        <button id="goPrescriber" class="btn" type="button">Prescriber Mode</button>
+        <button id="goAdmin" class="btn" type="button">Admin Mode</button>
+      </div>
+      <div style="margin-top:12px;color:#666;font-size:12px;line-height:1.35">
+        Admin Mode requires an approved admin account in Supabase.
+      </div>
+    </div>
+  </div>
 
-/* Auth */
-async function signIn() {
-  const email = el("loginEmail").value.trim();
-  const password = el("loginPassword").value.trim();
-  const err = el("loginError");
+  <!-- Login -->
+  <div id="loginOverlay" class="overlay hidden">
+    <div class="box">
+      <h2 id="loginTitle" style="margin:0 0 8px">Login</h2>
+      <p id="loginSubtitle" style="margin:0 0 14px;color:#444"></p>
 
-  err.style.display = "none";
-  err.textContent = "";
+      <div style="display:grid;gap:10px">
+        <input id="loginEmail" type="email" placeholder="Email" autocomplete="email" />
+        <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" />
+        <label style="display:flex;align-items:center;gap:8px;color:#444;font-size:13px;">
+          <input id="showPwd" type="checkbox" />
+          Show password
+        </label>
+      </div>
 
-  const res = await sb.auth.signInWithPassword({ email, password });
-  if (res.error) {
-    err.textContent = res.error.message;
-    err.style.display = "block";
-    return;
-  }
+      <div id="loginError" class="err hidden"></div>
 
-  afterLogin();
-}
+      <div class="row" style="margin-top:14px">
+        <button id="loginSignIn" class="btn" type="button">Sign in</button>
+        <button id="loginSignUp" class="btn" type="button">Create account</button>
+      </div>
+      <div style="margin-top:10px">
+        <button id="loginBack" class="btn" type="button">← Back</button>
+      </div>
+    </div>
+  </div>
 
-async function afterLogin() {
-  show("loginOverlay", false);
-  show("landing", false);
-  show("app", true);
-}
+  <!-- App -->
+  <div id="app" class="hidden">
+    <h1 style="margin:0 0 10px;font-size:20px">Melasma Prescription Builder</h1>
+    <div id="modeBadge" style="color:#444;margin-bottom:10px"></div>
 
-/* Wire buttons safely */
-document.addEventListener("DOMContentLoaded", function () {
+    <div id="adminPanel" class="hidden" style="border:1px dashed #ccc;border-radius:14px;padding:12px;margin-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="font-weight:700">Admin Panel</div>
+        <button id="adminLoadPrescribers" class="btn" type="button">Load Prescribers</button>
+      </div>
+      <div id="adminErr" class="err hidden"></div>
+      <div style="margin-top:10px;overflow:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:720px">
+          <thead>
+            <tr>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left">Name</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left">Address</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left">Contact</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left">Prescriber #</th>
+            </tr>
+          </thead>
+          <tbody id="prescriberRows">
+            <tr><td colspan="4" style="border:1px solid #ddd;padding:8px;color:#666">Click “Load Prescribers”.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-  const prescriberBtn = el("goPrescriber");
-  if (prescriberBtn) {
-    prescriberBtn.addEventListener("click", function () {
-      authIntent = "prescriber";
-      el("loginTitle").textContent = "Prescriber Login";
-      el("loginSubtitle").textContent = "Sign in to continue";
-      show("landing", false);
-      show("loginOverlay", true);
-    });
-  }
+    <div style="margin-top:14px">
+      <button id="logoutBtn" class="btn" type="button">Log out</button>
+    </div>
+  </div>
 
-  const adminBtn = el("goAdmin");
-  if (adminBtn) {
-    adminBtn.addEventListener("click", function () {
-      authIntent = "admin";
-      el("loginTitle").textContent = "Admin Login";
-      el("loginSubtitle").textContent = "Sign in to continue";
-      show("landing", false);
-      show("loginOverlay", true);
-    });
-  }
+  <script>
+    "use strict";
 
-  const loginBtn = el("loginSignIn");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", signIn);
-  }
+    const SUPABASE_URL = "https://ogzruhymglenzwizmggd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_VudO6SBFp9kzL2YIkSeTQA_dP8jdGHC";
 
-  const backBtn = el("loginBack");
-  if (backBtn) {
-    backBtn.addEventListener("click", function () {
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const $ = (id) => document.getElementById(id);
+    const show = (id, on) => $(id).classList.toggle("hidden", !on);
+    const setText = (id, t) => { $(id).textContent = t; };
+
+    let intent = "prescriber"; // prescriber | admin
+
+    function showErr(elId, msg){
+      const el = $(elId);
+      el.textContent = msg || "";
+      el.classList.toggle("hidden", !msg);
+    }
+
+    async function afterLogin(){
+      const { data: { user } } = await sb.auth.getUser();
+      if(!user) return;
+
+      if(intent === "admin"){
+        const { data, error } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle();
+        if(error || !data){
+          await sb.auth.signOut();
+          showErr("loginError", "This account is not approved for admin access.");
+          show("loginError", true);
+          return;
+        }
+        show("adminPanel", true);
+        setText("modeBadge", "Mode: ADMIN (approved)");
+      }else{
+        show("adminPanel", false);
+        setText("modeBadge", "Mode: PRESCRIBER");
+      }
+
       show("loginOverlay", false);
-      show("landing", true);
-    });
-  }
-});
-</script>
+      show("landing", false);
+      show("app", true);
+    }
 
-</script>
+    async function signIn(){
+      showErr("loginError", "");
+      const email = $("loginEmail").value.trim().toLowerCase();
+      const password = $("loginPassword").value.trim();
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){
+        showErr("loginError", error.message || "Sign in failed.");
+        return;
+      }
+      await afterLogin();
+    }
+
+    async function signUp(){
+      showErr("loginError", "");
+      const email = $("loginEmail").value.trim().toLowerCase();
+      const password = $("loginPassword").value.trim();
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error){
+        showErr("loginError", error.message || "Sign up failed.");
+        return;
+      }
+      // Try sign in (works if confirmations disabled)
+      const { error: e2 } = await sb.auth.signInWithPassword({ email, password });
+      if(e2){
+        showErr("loginError", "Account created. If email confirmation is enabled, confirm via email then sign in.");
+        return;
+      }
+      await afterLogin();
+    }
+
+    async function loadPrescribers(){
+      showErr("adminErr", "");
+      const body = $("prescriberRows");
+      body.innerHTML = '<tr><td colspan="4" style="border:1px solid #ddd;padding:8px;color:#666">Loading…</td></tr>';
+
+      const { data, error } = await sb
+        .from("profiles")
+        .select("prescriber_name,clinic_address,clinic_contact,prescriber_number,updated_at")
+        .order("updated_at", { ascending:false })
+        .limit(500);
+
+      if(error){
+        showErr("adminErr", "Could not load list. Check policies (admins can read all profiles).");
+        body.innerHTML = '<tr><td colspan="4" style="border:1px solid #ddd;padding:8px;color:#666">No data.</td></tr>';
+        return;
+      }
+
+      if(!data || !data.length){
+        body.innerHTML = '<tr><td colspan="4" style="border:1px solid #ddd;padding:8px;color:#666">No profiles found.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = data.map(r => `
+        <tr>
+          <td style="border:1px solid #ddd;padding:8px">${r.prescriber_name || ""}</td>
+          <td style="border:1px solid #ddd;padding:8px">${r.clinic_address || ""}</td>
+          <td style="border:1px solid #ddd;padding:8px">${r.clinic_contact || ""}</td>
+          <td style="border:1px solid #ddd;padding:8px">${r.prescriber_number || ""}</td>
+        </tr>
+      `).join("");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      $("goPrescriber").addEventListener("click", () => {
+        intent = "prescriber";
+        setText("loginTitle", "Prescriber Login");
+        setText("loginSubtitle", "Sign in with your prescriber account.");
+        show("landing", false);
+        show("loginOverlay", true);
+      });
+
+      $("goAdmin").addEventListener("click", () => {
+        intent = "admin";
+        setText("loginTitle", "Admin Login");
+        setText("loginSubtitle", "Sign in with an approved admin account.");
+        show("landing", false);
+        show("loginOverlay", true);
+      });
+
+      $("loginSignIn").addEventListener("click", signIn);
+      $("loginSignUp").addEventListener("click", signUp);
+      $("loginBack").addEventListener("click", () => {
+        showErr("loginError", "");
+        show("loginOverlay", false);
+        show("landing", true);
+      });
+
+      $("showPwd").addEventListener("change", (e) => {
+        $("loginPassword").type = e.target.checked ? "text" : "password";
+      });
+
+      $("adminLoadPrescribers").addEventListener("click", loadPrescribers);
+
+      $("logoutBtn").addEventListener("click", async () => {
+        await sb.auth.signOut();
+        show("app", false);
+        show("loginOverlay", false);
+        show("landing", true);
+      });
+    });
+  </script>
+
+</body>
+</html>
