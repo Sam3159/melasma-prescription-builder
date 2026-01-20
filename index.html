@@ -77,47 +77,56 @@ async function signUp(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  $("goPrescriber").addEventListener("click", () => {
-    authIntent = "prescriber";
-    $("loginTitle").textContent = "Prescriber Login";
-    $("loginSubtitle").textContent = "Sign in to access your saved profile";
-    show("landing", false);
-    show("loginOverlay", true);
-  });
+ document.addEventListener("DOMContentLoaded", () => {
 
-  $("goAdmin").addEventListener("click", () => {
-    authIntent = "admin";
-    $("loginTitle").textContent = "Admin Login";
-    $("loginSubtitle").textContent = "Admin access requires approval";
-    show("landing", false);
-    show("loginOverlay", true);
-  });
-
-  $("loginSignIn").addEventListener("click", signIn);
-  $("loginSignUp").addEventListener("click", signUp);
-  $("loginBack").addEventListener("click", () => { show("loginOverlay", false); show("landing", true); });
-
-  const loadBtn = $("loadPrescribers");
-  if(loadBtn){
-    loadBtn.addEventListener("click", async () => {
-      const body = $("prescriberTable");
-      body.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
-      const { data, error } = await sb.from("profiles")
-        .select("prescriber_name,clinic_address,clinic_contact,prescriber_number")
-        .limit(500);
-      if(error){
-        body.innerHTML = `<tr><td colspan="4">Error loading list.</td></tr>`;
-        return;
-      }
-      body.innerHTML = (data||[]).map(r => `
-        <tr>
-          <td>${r.prescriber_name||""}</td>
-          <td>${r.clinic_address||""}</td>
-          <td>${r.clinic_contact||""}</td>
-          <td>${r.prescriber_number||""}</td>
-        </tr>
-      `).join("") || `<tr><td colspan="4">No data</td></tr>`;
+  const goPrescriber = document.getElementById("goPrescriber");
+  if (goPrescriber) {
+    goPrescriber.addEventListener("click", () => {
+      authIntent = "prescriber";
+      document.getElementById("loginTitle").textContent = "Prescriber Login";
+      document.getElementById("loginSubtitle").textContent =
+        "Sign in to access your saved profile";
+      show("landing", false);
+      show("loginOverlay", true);
     });
+  }
+
+  const goAdmin = document.getElementById("goAdmin");
+  if (goAdmin) {
+    goAdmin.addEventListener("click", () => {
+      authIntent = "admin";
+      document.getElementById("loginTitle").textContent = "Admin Login";
+      document.getElementById("loginSubtitle").textContent =
+        "Admin access requires approval";
+      show("landing", false);
+      show("loginOverlay", true);
+    });
+  }
+
+  const loginSignIn = document.getElementById("loginSignIn");
+  if (loginSignIn) {
+    loginSignIn.addEventListener("click", signIn);
+  }
+
+  const loginSignUp = document.getElementById("loginSignUp");
+  if (loginSignUp) {
+    loginSignUp.addEventListener("click", signUp);
+  }
+
+  const loginBack = document.getElementById("loginBack");
+  if (loginBack) {
+    loginBack.addEventListener("click", () => {
+      show("loginOverlay", false);
+      show("landing", true);
+    });
+  }
+
+  const loadBtn = document.getElementById("loadPrescribers");
+  if (loadBtn) {
+    loadBtn.addEventListener("click", loadPrescribers);
+  }
+});
+
   }
 });
 </script>
