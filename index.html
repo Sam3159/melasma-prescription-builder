@@ -15,7 +15,7 @@
 body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:#f4f4f4}
 .hidden{display:none!important}
 .page{max-width:1180px;margin:18px auto;padding:0 16px 24px}
-.brand-banner img{width:100%;height:auto;display:block;border-radius:12px}
+.brand-banner img{width:100%;height:auto;display:block;border-radius:12pxmax-height:70px;object-fit:cover;object-position:center;}
 .brand-banner{margin:12px 0}
 h1{font-size:20px;margin:8px 0 10px;line-height:1.25}
 h2{font-size:14px;margin:12px 0 8px}
@@ -182,6 +182,13 @@ body.print-preview .print-mirror{display:block!important}
   </div>
 
   <div class="grid">
+    <div class="card" id="prescriberCard">
+      <h2>Prescriber details</h2>
+      <div class="row"><div class="label">Date</div><input id="rxDate" type="text"><div class="print-mirror" data-for="rxDate" id="pm_rxDate"></div></div>
+      <div class="row"><div class="label">Prescriber name</div><input id="rxPrescriber" type="text"><div class="print-mirror" data-for="rxPrescriber" id="pm_rxPrescriber"></div></div>
+      <div class="row"><div class="label">Clinic address</div><input id="rxClinic" type="text"><div class="print-mirror" data-for="rxClinic" id="pm_rxClinic"></div></div>
+      <div class="row"><div class="label">Clinic contact</div><input id="rxContact" type="text"><div class="print-mirror" data-for="rxContact" id="pm_rxContact"></div></div>
+      <div class="row"><div class="label">Prescriber no.</div><input id="rxNumber" type="text"><div class="print-mirror" data-for="rxNumber" id="pm_rxNumber"></div></div>
     <div class="card" id="patientCard">
       <h2>Patient details</h2>
       <div class="row"><div class="label">Patient name</div><input id="patientName" type="text"><div class="print-mirror" data-for="patientName" id="pm_patientName"></div></div>
@@ -190,13 +197,6 @@ body.print-preview .print-mirror{display:block!important}
       <div class="row"><div class="label">Phone</div><input id="patientPhone" type="text"><div class="print-mirror" data-for="patientPhone" id="pm_patientPhone"></div></div>
     </div>
 
-    <div class="card" id="prescriberCard">
-      <h2>Prescriber details</h2>
-      <div class="row"><div class="label">Date</div><input id="rxDate" type="text"><div class="print-mirror" data-for="rxDate" id="pm_rxDate"></div></div>
-      <div class="row"><div class="label">Prescriber name</div><input id="rxPrescriber" type="text"><div class="print-mirror" data-for="rxPrescriber" id="pm_rxPrescriber"></div></div>
-      <div class="row"><div class="label">Clinic address</div><input id="rxClinic" type="text"><div class="print-mirror" data-for="rxClinic" id="pm_rxClinic"></div></div>
-      <div class="row"><div class="label">Clinic contact</div><input id="rxContact" type="text"><div class="print-mirror" data-for="rxContact" id="pm_rxContact"></div></div>
-      <div class="row"><div class="label">Prescriber no.</div><input id="rxNumber" type="text"><div class="print-mirror" data-for="rxNumber" id="pm_rxNumber"></div></div>
     </div>
   </div>
 
@@ -230,7 +230,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="tretinoin">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="tretinoin" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="tretinoin" value="0.508"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="tretinoin">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -248,7 +248,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="tranexamic_acid">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="tranexamic_acid" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="tranexamic_acid" value="2.9"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="tranexamic_acid">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -285,7 +285,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="azelaic_acid">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="azelaic_acid" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="azelaic_acid" value="1.15"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="azelaic_acid">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -303,7 +303,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="kojic_acid">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="kojic_acid" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="kojic_acid" value="6.2"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="kojic_acid">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -321,7 +321,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="licorice_extract">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="licorice_extract" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="licorice_extract" value="61"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="licorice_extract">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -339,7 +339,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="cysteamine">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="cysteamine" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="cysteamine" value="6.02"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="cysteamine">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -357,7 +357,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="vitamin_c">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="vitamin_c" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="vitamin_c" value="0.11"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="vitamin_c">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -376,7 +376,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="niacinamide">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="niacinamide" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="niacinamide" value="0.15"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="niacinamide">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -394,7 +394,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="arbutin">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="arbutin" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="arbutin" value="10.21"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="arbutin">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -412,7 +412,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="hydrocortisone">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="hydrocortisone" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="hydrocortisone" value="6.4"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="hydrocortisone">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -430,7 +430,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="dexamethasone">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="dexamethasone" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="dexamethasone" value="65"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="dexamethasone">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -448,7 +448,7 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </td>
   <td class="col-activesg"><span class="activesg" data-key="fluocinolone">—</span></td>
-  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="fluocinolone" value="0.00"></td>
+  <td class="col-cpg admin-only"><input type="number" step="0.01" min="0" class="cpg" data-key="fluocinolone" value="270"></td>
   <td class="col-cost admin-only"><span class="ingcost" data-key="fluocinolone">—</span></td>
   <td class="col-notes admin-only"><span class="muted">edit cost per g</span></td>
 </tr>
@@ -499,7 +499,34 @@ body.print-preview .print-mirror{display:block!important}
     </div>
   </div>
 
-  <div class="card" id="formulaCard">
+  
+  <div class="card admin-only" id="adminPrescribersCard">
+    <h2>Admin: Prescribers using the form</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+      <button class="btn" id="adminRefreshPrescribers" type="button">Refresh list</button>
+      <button class="btn" id="adminExportPrescribers" type="button">Export CSV</button>
+      <span class="muted" id="adminPrescribersStatus"></span>
+    </div>
+    <div style="overflow:auto;border:1px solid var(--border);border-radius:12px;">
+      <table style="border:none;border-radius:0;">
+        <thead>
+          <tr>
+            <th>Prescriber name</th>
+            <th>Clinic address</th>
+            <th>Clinic contact</th>
+            <th>Prescriber number</th>
+            <th>Email</th>
+            <th>Last updated</th>
+          </tr>
+        </thead>
+        <tbody id="adminPrescribersRows">
+          <tr><td colspan="6" class="muted">Click “Refresh list”.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<div class="card" id="formulaCard">
     <h2>Written formula</h2>
     <div class="formula-box" id="formulaBox"><span class="formula-empty">Tick ingredients and enter strengths to build formula.</span></div>
     <div class="print-mirror" id="pm_formulaBox"></div>
@@ -626,6 +653,7 @@ async function afterLogin() {
   }
 
   setModeNote();
+  if(authMode === "admin") { loadPrescriberList(); }
   show("loginOverlay", false);
   show("landingOverlay", false);
 
@@ -925,10 +953,79 @@ function recalcAll() {
 
 async function loadPrescriberList() {
   if(authMode !== "admin") return;
-  var tbody = el("adminPrescriberRows");
+  var tbody = el("adminPrescribersRows");
+  var status = el("adminPrescribersStatus");
   if(!tbody) return;
+
+  status.textContent = "Loading…";
+  tbody.innerHTML = '<tr><td colspan="6" class="muted">Loading…</td></tr>';
+
+  // Requires RLS policy: admins can read all profiles
+  var res = await sb
+    .from("profiles")
+    .select("prescriber_name,clinic_address,clinic_contact,prescriber_number,email,updated_at")
+    .order("updated_at", { ascending: false })
+    .limit(1000);
+
+  if(res.error) {
+    status.textContent = "Could not load list (check admin RLS policy).";
+    tbody.innerHTML = '<tr><td colspan="6" class="muted">Error loading prescribers.</td></tr>';
+    return;
+  }
+
+  var rows = res.data || [];
+  status.textContent = rows.length ? (rows.length + " prescribers") : "No prescribers yet.";
+  if(!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="muted">No profiles found yet.</td></tr>';
+    return;
+  }
+
+  var html = "";
+  for(var i=0;i<rows.length;i++) {
+    var r = rows[i] || {};
+    html += "<tr>"
+      + "<td>" + (r.prescriber_name || "") + "</td>"
+      + "<td>" + (r.clinic_address || "") + "</td>"
+      + "<td>" + (r.clinic_contact || "") + "</td>"
+      + "<td>" + (r.prescriber_number || "") + "</td>"
+      + "<td>" + (r.email || "") + "</td>"
+      + "<td>" + (r.updated_at ? new Date(r.updated_at).toLocaleString() : "") + "</td>"
+      + "</tr>";
+  }
+  tbody.innerHTML = html;
 }
 
+function exportPrescriberCSV() {
+  if(authMode !== "admin") return;
+  var tbody = el("adminPrescribersRows");
+  if(!tbody) return;
+
+  var lines = [];
+  lines.push(["Prescriber name","Clinic address","Clinic contact","Prescriber number","Email","Last updated"].join(","));
+
+  var trs = tbody.querySelectorAll("tr");
+  for(var i=0;i<trs.length;i++) {
+    var tds = trs[i].querySelectorAll("td");
+    if(!tds || tds.length < 6) continue;
+    var row = [];
+    for(var j=0;j<6;j++) {
+      var val = (tds[j].textContent || "").replace(/"/g,'""');
+      row.push('"' + val + '"');
+    }
+    lines.push(row.join(","));
+  }
+
+  var blob = new Blob([lines.join("
+")], { type: "text/csv;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "prescribers.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 document.addEventListener("DOMContentLoaded", function() {
   // Landing
   el("enterPrescriber").addEventListener("click", function() {
@@ -977,6 +1074,18 @@ document.addEventListener("DOMContentLoaded", function() {
     el("pNumber").value = el("rxNumber").value || "";
     show("profileOverlay", true);
   });
+  // Admin prescriber list
+  if(el("adminRefreshPrescribers")) {
+    el("adminRefreshPrescribers").addEventListener("click", function() {
+      loadPrescriberList();
+    });
+  }
+  if(el("adminExportPrescribers")) {
+    el("adminExportPrescribers").addEventListener("click", function() {
+      exportPrescriberCSV();
+    });
+  }
+
 
   // Quantity default
   el("qty30").checked = true;
@@ -1020,8 +1129,10 @@ document.addEventListener("DOMContentLoaded", function() {
   // Instructions/signature/repeats mirrors update
   ["instructions","signature","repeats","patientName","patientDob","patientAddress","patientPhone","rxDate","rxPrescriber","rxClinic","rxContact","rxNumber"].forEach(function(id) {
     el(id).addEventListener("input", function() {
+      // Always keep written formula in sync (e.g. repeats changes)
+      setFormulaBox();
+      // In print preview, also update mirrors and page fit
       if(document.body.classList.contains("print-preview")) {
-        setFormulaBox();
         syncMirrors();
         fitToOnePage();
       }
