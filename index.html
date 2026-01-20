@@ -122,6 +122,23 @@ async function signIn(){
     err.style.display="block";
     return;
   }
+  async function signUp(){
+  var email = el("loginEmail").value.trim();
+  var password = el("loginPassword").value.trim();
+  var err = el("loginError");
+  err.style.display="none";
+
+  var res = await sb.auth.signUp({email:email,password:password});
+  if(res.error){
+    err.textContent=res.error.message;
+    err.style.display="block";
+    return;
+  }
+
+  // If email confirmations are OFF, user may already be signed in:
+  afterLogin();
+}
+
   afterLogin();
 }
 
@@ -179,7 +196,7 @@ document.addEventListener("DOMContentLoaded",function(){
     show("landing",false);show("loginOverlay",true);
   };
   el("loginSignIn").onclick=signIn;
-  el("loginSignUp").onclick=signIn;
+  el("loginSignUp").onclick=signUp;
   el("loginBack").onclick=function(){show("loginOverlay",false);show("landing",true)};
   el("loadPrescribers").onclick=loadPrescribers;
   el("logoutBtn").onclick=async function(){
