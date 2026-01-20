@@ -1,196 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Melasma Prescription Builder</title>
-
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-/* ===== BASIC LAYOUT ===== */
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f7f7f7}
-.page{max-width:1180px;margin:20px auto;background:#fff;padding:16px;border-radius:14px}
-
-/* Buttons */
-.btn{border:1px solid #ccc;border-radius:999px;padding:10px 14px;background:#fff;cursor:pointer}
-.btn:hover{background:#f0f0f0}
-
-/* Cards */
-.card{border:1px solid #ddd;border-radius:14px;padding:12px;margin-bottom:12px;background:#fff}
-
-/* Admin only */
-.admin-only{display:none}
-body.admin-mode .admin-only{display:block}
-
-/* Tables */
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ddd;padding:8px;font-size:13px}
-
-/* Overlay */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);
-  display:flex;align-items:center;justify-content:center;z-index:9999
-}
-.overlay-box{
-  background:#fff;padding:22px;border-radius:18px;width:420px
-}
-.hidden{display:none}
-</style>
-</head>
-
-<body>
-
-<!-- LANDING -->
-<div id="landing" class="overlay">
-  <div class="overlay-box">
-    <h2>Welcome</h2>
-    <p>Select how you want to use the builder</p>
-    <button class="btn" id="goPrescriber">Prescriber Mode</button><br><br>
-    <button class="btn" id="goAdmin">Admin Mode</button>
-  </div>
-</div>
-
-<!-- LOGIN -->
-<div id="loginOverlay" class="overlay hidden">
-  <div class="overlay-box">
-    <h2 id="loginTitle">Login</h2>
-    <p id="loginSubtitle"></p>
-
-    <input id="loginEmail" placeholder="Email" style="width:100%;padding:10px;margin-bottom:8px">
-    <input id="loginPassword" placeholder="Password" type="password" style="width:100%;padding:10px;margin-bottom:8px">
-
-    <div id="loginError" style="color:#b00020;display:none"></div>
-
-    <button class="btn" id="loginSignIn">Sign in</button>
-    <button class="btn" id="loginSignUp">Create account</button>
-    <button class="btn" id="loginBack">← Back</button>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<div class="page hidden" id="app">
-
-  <h1>Melasma Prescription Builder</h1>
-
-  <!-- ADMIN PANEL -->
-  <div class="card admin-only">
-    <h3>Prescribers using this form</h3>
-    <button class="btn" id="loadPrescribers">Refresh list</button>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Address</th>
-          <th>Contact</th>
-          <th>Prescriber #</th>
-        </tr>
-      </thead>
-      <tbody id="prescriberTable">
-        <tr><td colspan="4">No data</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <p>✅ You are logged in.</p>
-
-</div>
-
 <script>
-<script>
-/* ===== SUPABASE CONFIG ===== */
 const SUPABASE_URL = "https://ogzruhymglenzwizmggd.supabase.co";
-const SUPABASE_KEY = "sb_publishable_VudO6SBFp9kzL2YIkSeTQA_dP8jdGHC;               
+const SUPABASE_KEY = "sb_publishable_VudO6SBFp9kzL2YIkSeTQA_dP8jdGHC";
 
-let sb = null;
-try {
-  if (window.supabase && typeof window.supabase.createClient === "function") {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch (e) {
-  console.warn("Supabase init failed:", e);
-}
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ===== HELPERS ===== */
 function $(id){ return document.getElementById(id); }
-function show(id,on){
-  const el = $(id);
-  if(!el) return;
-  el.classList.toggle("hidden", !on);
-}
+function show(id,on){ $(id).classList.toggle("hidden", !on); }
 function setAdmin(on){ document.body.classList.toggle("admin-mode", !!on); }
 
-/* ===== STATE ===== */
 let authIntent = "prescriber";
 
-/* ===== AUTH ===== */
-async function signIn(){
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value.trim();
-  const errEl = $("loginError");
-
-  errEl.style.display = "none";
-  errEl.textContent = "";
-
-  if(!sb){
-    errEl.textContent = "Supabase is not initialised. Check SUPABASE_URL and SUPABASE_KEY.";
-    errEl.style.display = "block";
-    return;
-  }
-
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if(error){
-    errEl.textContent = error.message || "Sign in failed.";
-    errEl.style.display = "block";
-    return;
-  }
-  await afterLogin();
-}
-
-async function signUp(){
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value.trim();
-  const errEl = $("loginError");
-
-  errEl.style.display = "none";
-  errEl.textContent = "";
-
-  if(!sb){
-    errEl.textContent = "Supabase is not initialised. Check SUPABASE_URL and SUPABASE_KEY.";
-    errEl.style.display = "block";
-    return;
-  }
-
-  const { error } = await sb.auth.signUp({ email, password });
-  if(error){
-    errEl.textContent = error.message || "Sign up failed.";
-    errEl.style.display = "block";
-    return;
-  }
-
-  // Try immediate sign-in (works if email confirmations disabled)
-  await signIn();
-}
-
 async function afterLogin(){
-  const errEl = $("loginError");
-  errEl.style.display = "none";
-  errEl.textContent = "";
-
   const { data: { user } } = await sb.auth.getUser();
-  if(!user){
-    errEl.textContent = "Could not read user session.";
-    errEl.style.display = "block";
-    return;
-  }
+  if(!user) return;
 
   if(authIntent === "admin"){
-    const { data, error } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle();
-    if(error || !data){
+    const { data } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle();
+    if(!data){
       await sb.auth.signOut();
-      errEl.textContent = "Not authorised as admin.";
-      errEl.style.display = "block";
+      const err = $("loginError");
+      err.textContent = "Not authorised as admin.";
+      err.style.display = "block";
       return;
     }
     setAdmin(true);
@@ -203,48 +34,50 @@ async function afterLogin(){
   show("app", true);
 }
 
-/* ===== ADMIN LIST ===== */
-async function loadPrescribers(){
-  if(!sb) return;
-  const body = $("prescriberTable");
-  body.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+async function signIn(){
+  const err = $("loginError");
+  err.style.display = "none";
+  err.textContent = "";
 
-  const { data, error } = await sb
-    .from("profiles")
-    .select("prescriber_name,clinic_address,clinic_contact,prescriber_number")
-    .order("updated_at", { ascending: false })
-    .limit(500);
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value.trim();
 
+  const { error } = await sb.auth.signInWithPassword({ email, password });
   if(error){
-    body.innerHTML = `<tr><td colspan="4">Error loading list (check policies).</td></tr>`;
+    err.textContent = error.message || "Sign in failed.";
+    err.style.display = "block";
     return;
   }
-
-  if(!data || !data.length){
-    body.innerHTML = `<tr><td colspan="4">No data</td></tr>`;
-    return;
-  }
-
-  body.innerHTML = data.map(r => `
-    <tr>
-      <td>${r.prescriber_name || ""}</td>
-      <td>${r.clinic_address || ""}</td>
-      <td>${r.clinic_contact || ""}</td>
-      <td>${r.prescriber_number || ""}</td>
-    </tr>
-  `).join("");
+  await afterLogin();
 }
 
-/* ===== WIRE BUTTONS SAFELY ===== */
-document.addEventListener("DOMContentLoaded", () => {
-  const goPrescriber = $("goPrescriber");
-  const goAdmin = $("goAdmin");
-  const loginSignIn = $("loginSignIn");
-  const loginSignUp = $("loginSignUp");
-  const loginBack = $("loginBack");
-  const loadBtn = $("loadPrescribers");
+async function signUp(){
+  const err = $("loginError");
+  err.style.display = "none";
+  err.textContent = "";
 
-  goPrescriber.addEventListener("click", () => {
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value.trim();
+
+  const { error } = await sb.auth.signUp({ email, password });
+  if(error){
+    err.textContent = error.message || "Sign up failed.";
+    err.style.display = "block";
+    return;
+  }
+
+  // Attempt immediate sign-in (works if email confirmation disabled)
+  const { error: e2 } = await sb.auth.signInWithPassword({ email, password });
+  if(e2){
+    err.textContent = "Account created. If email confirmation is enabled, confirm via email then sign in.";
+    err.style.display = "block";
+    return;
+  }
+  await afterLogin();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $("goPrescriber").addEventListener("click", () => {
     authIntent = "prescriber";
     $("loginTitle").textContent = "Prescriber Login";
     $("loginSubtitle").textContent = "Sign in to access your saved profile";
@@ -252,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     show("loginOverlay", true);
   });
 
-  goAdmin.addEventListener("click", () => {
+  $("goAdmin").addEventListener("click", () => {
     authIntent = "admin";
     $("loginTitle").textContent = "Admin Login";
     $("loginSubtitle").textContent = "Admin access requires approval";
@@ -260,15 +93,31 @@ document.addEventListener("DOMContentLoaded", () => {
     show("loginOverlay", true);
   });
 
-  loginSignIn.addEventListener("click", signIn);
-  loginSignUp.addEventListener("click", signUp);
-  loginBack.addEventListener("click", () => { show("loginOverlay", false); show("landing", true); });
+  $("loginSignIn").addEventListener("click", signIn);
+  $("loginSignUp").addEventListener("click", signUp);
+  $("loginBack").addEventListener("click", () => { show("loginOverlay", false); show("landing", true); });
 
-  if(loadBtn) loadBtn.addEventListener("click", loadPrescribers);
+  const loadBtn = $("loadPrescribers");
+  if(loadBtn){
+    loadBtn.addEventListener("click", async () => {
+      const body = $("prescriberTable");
+      body.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+      const { data, error } = await sb.from("profiles")
+        .select("prescriber_name,clinic_address,clinic_contact,prescriber_number")
+        .limit(500);
+      if(error){
+        body.innerHTML = `<tr><td colspan="4">Error loading list.</td></tr>`;
+        return;
+      }
+      body.innerHTML = (data||[]).map(r => `
+        <tr>
+          <td>${r.prescriber_name||""}</td>
+          <td>${r.clinic_address||""}</td>
+          <td>${r.clinic_contact||""}</td>
+          <td>${r.prescriber_number||""}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="4">No data</td></tr>`;
+    });
+  }
 });
 </script>
-
-</script>
-
-</body>
-</html>
