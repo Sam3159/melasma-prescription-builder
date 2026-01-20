@@ -1,129 +1,90 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+
+/* Supabase config */
 const SUPABASE_URL = "https://ogzruhymglenzwizmggd.supabase.co";
 const SUPABASE_KEY = "sb_publishable_VudO6SBFp9kzL2YIkSeTQA_dP8jdGHC";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function $(id){ return document.getElementById(id); }
-function show(id,on){ $(id).classList.toggle("hidden", !on); }
-function setAdmin(on){ document.body.classList.toggle("admin-mode", !!on); }
+/* Helpers */
+function el(id) {
+  return document.getElementById(id);
+}
+function show(id, on) {
+  const e = el(id);
+  if (!e) return;
+  e.classList.toggle("hidden", !on);
+}
 
 let authIntent = "prescriber";
 
-async function afterLogin(){
-  const { data: { user } } = await sb.auth.getUser();
-  if(!user) return;
+/* Auth */
+async function signIn() {
+  const email = el("loginEmail").value.trim();
+  const password = el("loginPassword").value.trim();
+  const err = el("loginError");
 
-  if(authIntent === "admin"){
-    const { data } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle();
-    if(!data){
-      await sb.auth.signOut();
-      const err = $("loginError");
-      err.textContent = "Not authorised as admin.";
-      err.style.display = "block";
-      return;
-    }
-    setAdmin(true);
-  } else {
-    setAdmin(false);
+  err.style.display = "none";
+  err.textContent = "";
+
+  const res = await sb.auth.signInWithPassword({ email, password });
+  if (res.error) {
+    err.textContent = res.error.message;
+    err.style.display = "block";
+    return;
   }
 
+  afterLogin();
+}
+
+async function afterLogin() {
   show("loginOverlay", false);
   show("landing", false);
   show("app", true);
 }
 
-async function signIn(){
-  const err = $("loginError");
-  err.style.display = "none";
-  err.textContent = "";
+/* Wire buttons safely */
+document.addEventListener("DOMContentLoaded", function () {
 
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value.trim();
-
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if(error){
-    err.textContent = error.message || "Sign in failed.";
-    err.style.display = "block";
-    return;
-  }
-  await afterLogin();
-}
-
-async function signUp(){
-  const err = $("loginError");
-  err.style.display = "none";
-  err.textContent = "";
-
-  const email = $("loginEmail").value.trim();
-  const password = $("loginPassword").value.trim();
-
-  const { error } = await sb.auth.signUp({ email, password });
-  if(error){
-    err.textContent = error.message || "Sign up failed.";
-    err.style.display = "block";
-    return;
-  }
-
-  // Attempt immediate sign-in (works if email confirmation disabled)
-  const { error: e2 } = await sb.auth.signInWithPassword({ email, password });
-  if(e2){
-    err.textContent = "Account created. If email confirmation is enabled, confirm via email then sign in.";
-    err.style.display = "block";
-    return;
-  }
-  await afterLogin();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const goPrescriber = document.getElementById("goPrescriber");
-  if (goPrescriber) {
-    goPrescriber.addEventListener("click", () => {
+  const prescriberBtn = el("goPrescriber");
+  if (prescriberBtn) {
+    prescriberBtn.addEventListener("click", function () {
       authIntent = "prescriber";
-      document.getElementById("loginTitle").textContent = "Prescriber Login";
-      document.getElementById("loginSubtitle").textContent =
-        "Sign in to access your saved profile";
+      el("loginTitle").textContent = "Prescriber Login";
+      el("loginSubtitle").textContent = "Sign in to continue";
       show("landing", false);
       show("loginOverlay", true);
     });
   }
 
-  const goAdmin = document.getElementById("goAdmin");
-  if (goAdmin) {
-    goAdmin.addEventListener("click", () => {
+  const adminBtn = el("goAdmin");
+  if (adminBtn) {
+    adminBtn.addEventListener("click", function () {
       authIntent = "admin";
-      document.getElementById("loginTitle").textContent = "Admin Login";
-      document.getElementById("loginSubtitle").textContent =
-        "Admin access requires approval";
+      el("loginTitle").textContent = "Admin Login";
+      el("loginSubtitle").textContent = "Sign in to continue";
       show("landing", false);
       show("loginOverlay", true);
     });
   }
 
-  const loginSignIn = document.getElementById("loginSignIn");
-  if (loginSignIn) {
-    loginSignIn.addEventListener("click", signIn);
+  const loginBtn = el("loginSignIn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", signIn);
   }
 
-  const loginSignUp = document.getElementById("loginSignUp");
-  if (loginSignUp) {
-    loginSignUp.addEventListener("click", signUp);
-  }
-
-  const loginBack = document.getElementById("loginBack");
-  if (loginBack) {
-    loginBack.addEventListener("click", () => {
+  const backBtn = el("loginBack");
+  if (backBtn) {
+    backBtn.addEventListener("click", function () {
       show("loginOverlay", false);
       show("landing", true);
     });
   }
-
-  const loadBtn = document.getElementById("loadPrescribers");
-  if (loadBtn) {
-    loadBtn.addEventListener("click", loadPrescribers);
-  }
 });
+</script>
 
 </script>
